@@ -1,2 +1,20 @@
-include:
-  - template: Security/Dependency-Scanning.gitlab-ci.yml
+stages:
+  - test
+
+gemnasium-dependency_scanning:
+  stage: test
+  image: registry.gitlab.com/security-products/gemnasium:5
+  variables:
+    SECURE_LOG_LEVEL: "debug"
+    DS_EXCLUDED_PATHS: "samples/, deps/"
+  script:
+    - /analyzer run
+  artifacts:
+    reports:
+      dependency_scanning: gl-dependency-scanning-report.json
+    paths:
+      - gl-dependency-scanning-report.json
+    when: always
+  allow_failure: true
+  rules:
+    - if: $CI_COMMIT_BRANCH
